@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script th:src="@{/script/jquery/jquery.js}" type="text/javascript"></script>
+    <script th:src="@{/script/common.js}" type="text/javascript"></script>
+</head>
+<body>
+<h1>主页</h1>
+<p>当前登录用户：<label id="currentUser" style="margin-right: 20px"></label><a href="javascript:void(0)" onclick="logout()">退出</a></p>
+</body>
+<script type="text/javascript">
+
+    $(function () {
+        initUserInfo();
+    });
+
+    /**
+     * 登出
+     */
+    function logout(){
+        Storage.setItem('login-user', null);
+        initUserInfo();
+    }
+
+    /**
+     * 初始化登录用户信息
+     */
+    function initUserInfo() {
+        let loginUser = Storage.getItem('login-user')
+        if (loginUser) {
+            let user = Storage.getItem(loginUser);
+            if(user){
+                user = JSON.parse(user);
+                $('#currentUser').text(user.name);
+            }else{
+                toLoginPage();
+            }
+        } else {
+            toLoginPage()
+        }
+    }
+
+    function toLoginPage(){
+        window.location.href = '/login';
+        // 如果没有登录请求oauth2去授权
+        requestAuthorization()
+    }
+
+
+
+    /**
+     * 请求授权
+     */
+    function requestAuthorization() {
+        window.location.href = client_param.authorization_uri
+            + '?client_id=' + client_param.client_id
+            + '&redirect_uri=' + client_param.redirect_uri
+            + '&response_type=' + client_param.response_type
+            + '&state=abcd'
+    }
+</script>
+</html>
