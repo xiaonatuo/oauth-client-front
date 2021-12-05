@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
@@ -34,29 +35,15 @@ public class OAuthController {
 
     @PostMapping("/token")
     public Object getToken(@RequestBody Map<String, String> params){
-       // restTemplate.setMessageConverters(getConverts());
-        HttpHeaders headers = new HttpHeaders();
-        //headers.setContentType(MediaType.APPLICATION_JSON);
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.setAll(params);
-        HttpEntity<Map<String, String>> body = new HttpEntity<>(params, headers);
-        return restTemplate.postForObject(access_token_uri, paramsMap, JSONObject.class);
+        try {
+            return restTemplate.postForObject(access_token_uri, paramsMap, JSONObject.class);
+        } catch (HttpClientErrorException e) {
+            return e.getMessage();
+        }
     }
 
 
 
-    private List<HttpMessageConverter<?>> getConverts() {
-        List<HttpMessageConverter<?>> messageConverters = new ArrayList<>();
-        // String转换器
-        StringHttpMessageConverter stringConvert = new StringHttpMessageConverter();
-        List<MediaType> stringMediaTypes = new ArrayList<MediaType>() {{
-            //添加响应数据格式，不匹配会报401
-            add(MediaType.TEXT_PLAIN);
-            add(MediaType.TEXT_HTML);
-            add(MediaType.APPLICATION_JSON);
-        }};
-        stringConvert.setSupportedMediaTypes(stringMediaTypes);
-        messageConverters.add(stringConvert);
-        return messageConverters;
-    }
 }

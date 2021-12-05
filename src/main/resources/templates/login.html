@@ -43,7 +43,7 @@
         };
         Utils.fetch('/oauth/token', JSON.stringify(data), 'post').then(res=>{
             console.info(res);
-        })
+        }).catch(err=>console.info(err))
     }
 
 
